@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+  <title>🇹🇿 Bongo Market · Zanzibar & Dar es Salaam</title>
+  <!-- Tailwind + Fonts + Font Awesome (icons halisi) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, deleteDoc,
+      query, where, orderBy, serverTimestamp, setDoc }
+      from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // 🔥 FIREBASE CONFIG HALISI (Bongo Market)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJe5ZWIwRDuXAM0fEKruQ2ZDj-OacpmBk",
+      authDomain: "bongo-market-ce85f.firebaseapp.com",
+      projectId: "bongo-market-ce85f",
+      storageBucket: "bongo-market-ce85f.firebasestorage.app",
+      messagingSenderId: "704150501918",
+      appId: "1:704150501918:web:d1e950378444eefe604c0f"
+    };
+    
+    // 🔁 BADILISHA HIZI KWA CLOUDINARY YAKO (kama utahitaji kupakia picha)
+    const CLOUDINARY_CLOUD_NAME = "djubaetjj";
+    const CLOUDINARY_UPLOAD_PRESET = "bongo_market"; // bila nafasi
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window._bm = { auth, db, collection, addDoc, getDocs, doc, getDoc, updateDoc,
+      deleteDoc, query, where, orderBy, serverTimestamp, setDoc,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
+      onAuthStateChanged, CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET };
+
+    onAuthStateChanged(auth, (user) => {
+      window._bmUser = user;
+      document.dispatchEvent(new CustomEvent("authchange", { detail: user }));
+    });
+  </script>
+
+  <style>
+    /* ========== MUUNDO SAFI · AIKONI 3D ========== */
+    :root {
+      --teal:   #0A7373;
+      --teal-d: #065959;
+      --teal-l: #0D9494;
+      --orange: #F4821A;
+      --orange-d: #D96B08;
+      --orange-l: #FFB057;
+      --cream:  #FFFFFF;
+      --sand:   #F3F4F6;
+      --brown:  #1F2937;
+      --brown-l:#4B5563;
+      --gray-bg: #F9FAFB;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      color: var(--brown);
+      min-height: 100vh;
+    }
+    h1,h2,h3,h4,h5 { font-family: 'Sora', sans-serif; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--sand); }
+    ::-webkit-scrollbar-thumb { background: var(--teal); border-radius: 3px; }
+
+    #navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .brand-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-mark {
+      width: 48px; height: 48px; border-radius: 999px;
+      background: var(--teal); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(10,115,115,0.15);
+    }
+    .brand-text {
+      display: flex; flex-direction: column; line-height: 1.2;
+    }
+    .brand-name {
+      font-family: 'Sora', sans-serif; font-weight: 800;
+      font-size: 1.25rem; color: var(--brown);
+    }
+    .brand-name span { color: var(--orange); }
+    .brand-tagline {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--brown-l);
+    }
+
+    /* ⭐ AIKONI 3D */
+    .icon-3d {
+      display: inline-block;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+      transform: perspective(200px) rotateX(2deg) rotateY(0deg);
+      transition: transform 0.15s;
+    }
+    .icon-3d:hover {
+      transform: perspective(200px) rotateX(0deg) rotateY(5deg) scale(1.05);
+    }
+
+    .hero {
+      background: #ffffff;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(10,115,115,0.08);
+      border: 1px solid rgba(10,115,115,0.15); border-radius: 999px;
+      padding: 6px 18px; font-size: 0.8rem; color: var(--teal);
+      font-weight: 600; margin-bottom: 16px;
+    }
+
+    .product-card {
+      background: #fff; border-radius: 16px; overflow: hidden;
+      transition: all 0.2s; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      border: 1px solid #edf2f7;
+    }
+    .product-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.06);
+    }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange) 0%, var(--orange-d) 100%);
+      color: white; font-weight: 700; border-radius: 12px;
+      padding: 10px 22px; border: none; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(244,130,26,0.25);
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-teal {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-d) 100%);
+      color: white; font-weight: 700; border-radius: 12px;
+      padding: 10px 22px; border: none; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(10,115,115,0.2);
+    }
+    .btn-wa {
+      background: #25D366; color: white; font-weight: 700; border-radius: 14px;
+      padding: 14px 28px; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(37,211,102,0.3);
+      display: flex; align-items: center; gap: 10px; justify-content: center;
+    }
+    .btn-outline {
+      background: transparent; border: 2px solid var(--teal);
+      color: var(--teal); font-weight: 700; border-radius: 12px;
+      padding: 8px 20px; cursor: pointer;
+    }
+
+    .search-wrap {
+      background: white; border-radius: 14px; border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02); overflow: hidden; display: flex;
+    }
+    .search-wrap input {
+      flex: 1; border: none; outline: none; padding: 12px 16px;
+    }
+    .search-wrap button {
+      background: var(--teal); border: none; padding: 12px 20px;
+      color: white; font-weight: 600; cursor: pointer;
+    }
+
+    .loc-pill {
+      border: 1.5px solid #d1d5db; color: var(--brown);
+      background: white; border-radius: 999px; padding: 6px 18px;
+      cursor: pointer; font-weight: 600;
+    }
+    .loc-pill.active, .loc-pill:hover {
+      background: var(--teal); border-color: var(--teal); color: white;
+    }
+    .filter-pill {
+      border: 1.5px solid #e2e8f0; color: var(--brown-l);
+      background: white; border-radius: 999px; padding: 6px 18px;
+      cursor: pointer; font-weight: 600;
+    }
+    .filter-pill.active, .filter-pill:hover {
+      background: var(--teal); border-color: var(--teal); color: white;
+    }
+
+    .badge-loc {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--gray-bg); border-radius: 999px;
+      padding: 3px 10px; font-size: 0.75rem; font-weight: 700;
+      color: var(--brown-l);
+    }
+    .cat-tag {
+      display: inline-block; background: #e6f7f7; color: var(--teal-d);
+      border-radius: 6px; padding: 2px 10px; font-size: 0.7rem;
+      font-weight: 700; text-transform: uppercase;
+    }
+
+    #sidebar {
+      background: #1e293b; min-height: 100vh;
+    }
+    .sidebar-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; border-radius: 10px; cursor: pointer;
+      color: #cbd5e1; font-weight: 600;
+    }
+    .sidebar-link:hover, .sidebar-link.active {
+      background: rgba(244,130,26,0.15); color: var(--orange-l);
+    }
+
+    .form-input {
+      width: 100%; border: 1.5px solid #e2e8f0; border-radius: 12px;
+      padding: 12px 16px; outline: none; background: white;
+    }
+    .form-input:focus { border-color: var(--teal); }
+    .form-label {
+      display: block; font-weight: 700; margin-bottom: 6px;
+      color: var(--brown);
+    }
+
+    #toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: #1e293b; color: white; border-radius: 12px;
+      padding: 14px 20px; font-weight: 600;
+      transform: translateY(100px); opacity: 0; transition: all 0.3s;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.success { background: var(--teal); }
+    #toast.error { background: #dc2626; }
+
+    .section-title { font-size: 1.8rem; font-weight: 800; color: var(--brown); }
+    .section-title span { color: var(--teal); }
+
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #e2e8f0;
+      border-top-color: var(--teal); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .page { animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    @media (max-width: 640px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .product-card img { height: 150px; }
+    }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--brown-l); }
+    footer { background: #1e293b; color: #e2e8f0; }
+    .footer-panel {
+      background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+    }
+    .upload-area {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border 0.2s;
+    }
+    .upload-area:hover { border-color: var(--teal); }
+  </style>
+</head>
+<body class="bg-white">
+
+<!-- ═══════════════════════════════════════════════════════════ NAVBAR -->
+<nav id="navbar">
+  <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Logo / Brand -->
+    <button onclick="window.navigate('home')" class="brand-lockup">
+      <span class="brand-mark">BM</span>
+      <span class="brand-text">
+        <span class="brand-name">Bongo<span>Market</span></span>
+        <span class="brand-tagline">Zanzibar & Dar</span>
+      </span>
+    </button>
+
+    <!-- Desktop Navigation (visible on md and up) -->
+    <div class="hidden md:flex items-center gap-5">
+      <!-- Search Box -->
+      <div class="search-wrap" style="min-width:260px;">
+        <input id="nav-search" placeholder="Search products..." onkeydown="if(event.key==='Enter')window.doSearch(this.value)" />
+        <button onclick="window.doSearch(document.getElementById('nav-search').value)"><i class="fas fa-search icon-3d"></i> Search</button>
+      </div>
+      <!-- Home Link -->
+      <button onclick="window.navigate('home')" class="text-gray-700 font-semibold text-sm hover:text-teal-700">
+        <i class="fas fa00home icon-3d mr-1"></i>Home
+      </button>
+      <!-- Auth Buttons (updated by JS) -->
+      <div id="nav-auth-btns">
+        <!-- Default static buttons (visible before auth state) -->
+        <div class="flex gap-2">
+          <button onclick="window.navigate('auth',{mode:'login'})" class="btn-outline text-sm py-2 px-4">
+            <i class="fas fa-sign-in-alt mr-1"></i>Login
+          </button>
+          <button onclick="window.navigate('auth',{mode:'register'})" class="btn-primary text-sm py-2 px-4">
+            <i class="fas fa-user-plus mr-1"></i>Register
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Icons (visible on small screens) -->
+    <div class="flex md:hidden items-center gap-3">
+      <button onclick="document.getElementById('mobile-search-bar').classList.toggle('hidden')" class="text-gray-700 text-xl">
+        <i class="fas fa-search icon-3d"></i>
+      </button>
+      <button id="mobile-menu-btn" class="text-gray-700 text-2xl">
+        <i class="fas fa-bars icon-3d"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Search Bar (hidden by default) -->
+  <div id="mobile-search-bar" class="hidden px-4 pb-3">
+    <div class="search-wrap">
+      <input id="mob-search" placeholder="Search..." onkeydown="if(event.key==='Enter')window.doSearch(this.value)" />
+      <button onclick="window.doSearch(document.getElementById('mob-search').value)"><i class="fas fa-search"></i> Search</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Menu (hidden by default) -->
+<div id="mobile-menu" class="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm hidden">
+  <div class="bg-gray-900 w-72 h-full p-6 flex flex-col gap-4 text-white" onclick="event.stopPropagation()">
+    <div class="brand-lockup mb-4">
+      <span class="brand-mark">BM</span>
+      <span class="brand-text">
+        <span class="brand-name text-white">Bongo<span class="text-orange-400">Market</span></span>
+      </span>
+    </div>
+    <!-- Mobile Home Link -->
+    <a onclick="window.navigate('home');window.closeMobileMenu()" class="sidebar-link">
+      <i class="fas fa-home mr-3"></i> Home
+    </a>
+    <!-- Mobile Auth Buttons (updated by JS) -->
+    <div id="mob-auth-btns">
+      <!-- Default static buttons -->
+      <button onclick="window.navigate('auth',{mode:'login'});window.closeMobileMenu()" class="sidebar-link">
+        <i class="fas fa-key mr-3"></i> Login
+      </button>
+      <button onclick="window.navigate('auth',{mode:'register'});window.closeMobileMenu()" class="sidebar-link text-orange-300">
+        <i class="fas fa-store mr-3"></i> Register
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Main App View -->
+<div id="app"></div>
+
+<!-- Footer -->
+<footer class="mt-16 py-12">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="footer-panel p-6 md:p-10">
+      <div class="grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <div class="brand-lockup mb-4"><span class="brand-mark">BM</span><span class="brand-text"><span class="brand-name text-white">Bongo<span class="text-orange-400">Market</span></span></span></div>
+          <h3 class="text-2xl font-bold text-white mb-2">Soko la kisasa, karibu nawe.</h3>
+          <p class="text-gray-300 text-sm mb-4">Nunua na uza moja kwa moja kupitia WhatsApp.</p>
+          <div class="flex gap-3 flex-wrap">
+            <span class="bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs font-semibold"><i class="fas fa-check-circle mr-1"></i>Wauzaji waaminifu</span>
+            <span class="bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs font-semibold"><i class="fab fa-whatsapp mr-1"></i>WhatsApp haraka</span>
+          </div>
+        </div>
+        <div class="bg-white/5 rounded-2xl p-5 border border-white/10">
+          <p class="text-xs uppercase tracking-wider text-gray-400 mb-3">Anza leo</p>
+          <button onclick="window.navigate('auth',{mode:'register'})" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-xl w-full text-left transition">
+            <span class="block text-sm font-normal text-orange-100"><i class="fas fa-store-alt mr-1"></i>Fungua akaunti ya muuzaji</span>
+            <span class="text-lg">Sell on Bongo →</span>
+          </button>
+        </div>
+      </div>
+      <div class="mt-8 pt-6 border-t border-white/10 text-sm text-gray-400 flex justify-between">
+        <span>© 2025 Bongo Market</span>
+        <span>Zanzibar · Dar es Salaam</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+  // ==================== GLOBAL FUNCTIONS & STATE ====================
+  window.toast = function(msg, type='success') {
+    const el = document.getElementById('toast');
+    el.className = `show ${type}`;
+    el.innerHTML = (type==='success'?'✅':type==='error'?'❌':'ℹ️') + ' ' + msg;
+    setTimeout(() => el.className = '', 3000);
+  };
+
+  window.waitForFB = function(ms=5000) {
+    return new Promise((res) => {
+      if (window._bm) return res();
+      const int = setInterval(() => { if (window._bm) { clearInterval(int); res(); } }, 100);
+    });
+  };
+
+  // Global state
+  window.currentPage = 'home';
+  window.currentUser = null;
+  window.currentUserData = null;
+  window.allProducts = [];
+  window.locationFilter = 'all';
+  window.currentCategory = 'All';
+  window.pendingImageFile = null; // for image upload
+
+  // Mobile menu
+  window.closeMobileMenu = function() {
+    document.getElementById('mobile-menu').classList.add('hidden');
+  };
+
+  // Attach mobile menu events
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    menuBtn.addEventListener('click', () => mobileMenu.classList.remove('hidden'));
+    mobileMenu.addEventListener('click', (e) => { if (e.target === mobileMenu) window.closeMobileMenu(); });
+  });
+
+  // Navigation
+  window.navigate = function(page, data={}) {
+    console.log('Navigating to:', page);
+    window.currentPage = page;
+    window._navData = data;
+    window.renderPage(page, data);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.closeMobileMenu();
+  };
+
+  window.renderPage = function(page, data) {
+    const app = document.getElementById('app');
+    document.querySelector('footer').style.display = (page === 'dashboard') ? 'none' : '';
+    if (page === 'home') window.renderHome();
+    else if (page === 'product') window.renderProduct(data.id);
+    else if (page === 'search') window.renderSearch(data.q);
+    else if (page === 'auth') window.renderAuth(data.mode || 'login');
+    else if (page === 'dashboard') window.renderDashboard(data.view || 'products');
+    window.updateNavAuth();
+  };
+
+  // Auth state listener
+  document.addEventListener('authchange', async (e) => {
+    window.currentUser = e.detail;
+    if (window.currentUser) {
+      await window.waitForFB();
+      const snap = await window._bm.getDoc(window._bm.doc(window._bm.db, 'users', window.currentUser.uid));
+      if (snap.exists()) window.currentUserData = { id: snap.id, ...snap.data() };
+    } else {
+      window.currentUserData = null;
+    }
+    window.updateNavAuth();
+    if (window.currentPage === 'auth' && window.currentUser) window.navigate('dashboard');
+  });
+
+  window.updateNavAuth = function() {
+    const btns = document.getElementById('nav-auth-btns');
+    const mob = document.getElementById('mob-auth-btns');
+    if (!btns || !mob) return;
+    if (window.currentUser) {
+      btns.innerHTML = `<div class="flex items-center gap-3">
+        <button onclick="window.navigate('dashboard')" class="btn-primary text-sm py-2 px-4"><i class="fas fa-tachometer-alt mr-1"></i>Dashboard</button>
+        <button onclick="window.doLogout()" class="text-gray-600 hover:text-gray-900"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>`;
+      mob.innerHTML = `<button onclick="window.navigate('dashboard');window.closeMobileMenu()" class="sidebar-link"><i class="fas fa-tachometer-alt mr-3"></i> Dashboard</button>
+        <button onclick="window.doLogout();window.closeMobileMenu()" class="sidebar-link text-red-300"><i class="fas fa-sign-out-alt mr-3"></i> Logout</button>`;
+    } else {
+      btns.innerHTML = `<div class="flex gap-2">
+        <button onclick="window.navigate('auth',{mode:'login'})" class="btn-outline text-sm py-2 px-4"><i class="fas fa-sign-in-alt mr-1"></i>Login</button>
+        <button onclick="window.navigate('auth',{mode:'register'})" class="btn-primary text-sm py-2 px-4"><i class="fas fa-user-plus mr-1"></i>Register</button>
+      </div>`;
+      mob.innerHTML = `<button onclick="window.navigate('auth',{mode:'login'});window.closeMobileMenu()" class="sidebar-link"><i class="fas fa-key mr-3"></i> Login</button>
+        <button onclick="window.navigate('auth',{mode:'register'});window.closeMobileMenu()" class="sidebar-link text-orange-300"><i class="fas fa-store mr-3"></i> Register</button>`;
+    }
+  };
+
+  window.doLogout = async function() {
+    await window.waitForFB();
+    await window._bm.signOut(window._bm.auth);
+    window.currentUser = null;
+    window.currentUserData = null;
+    window.toast('Umetoka');
+    window.navigate('home');
+  };
+
+  // ---------- HOME ----------
+  window.renderHome = async function() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="page">
+        <section class="hero py-12 px-4 border-b border-gray-100">
+          <div class="max-w-4xl mx-auto text-center">
+            <div class="hero-badge"><i class="fas fa-globe-africa icon-3d mr-2"></i>Zanzibar · Dar es Salaam</div>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-3">Soko Lako,<br/><span class="text-teal-600">Mtandaoni</span></h1>
+            <p class="text-gray-500 text-lg mb-8 max-w-xl mx-auto">Gundua bidhaa bora kutoka kwa wauzaji waaminifu. Wasiliana moja kwa moja kupitia WhatsApp.</p>
+            <div class="search-wrap max-w-xl mx-auto mb-6">
+              <input id="hero-search" placeholder="Search products or sellers..." onkeydown="if(event.key==='Enter')window.doSearch(this.value)" />
+              <button onclick="window.doSearch(document.getElementById('hero-search').value)"><i class="fas fa-search"></i> Search</button>
+            </div>
+            <div class="flex justify-center gap-3 flex-wrap">
+              <button onclick="window.setLocFilter('all')" class="loc-pill active" id="loc-all"><i class="fas fa-map-marked-alt mr-1"></i>All Locations</button>
+              <button onclick="window.setLocFilter('Zanzibar')" class="loc-pill" id="loc-zanzibar"><i class="fas fa-umbrella-beach mr-1"></i>Zanzibar</button>
+              <button onclick="window.setLocFilter('Dar es Salaam')" class="loc-pill" id="loc-dar"><i class="fas fa-city mr-1"></i>Dar es Salaam</button>
+            </div>
+          </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-4 py-8">
+          <h2 class="section-title text-2xl mb-4"><i class="fas fa-cubes icon-3d mr-2"></i>Browse <span>Categories</span></h2>
+          <div class="flex gap-3 flex-wrap">
+            ${['All','Food & Drinks','Fashion & Clothing','Electronics','Home & Living','Beauty & Health','Crafts & Art','Agriculture','Services'].map(c =>
+              `<button onclick="window.filterByCategory('${c}')" class="filter-pill ${c==='All'?'active':''}"><i class="fas fa-tag mr-1"></i>${c}</button>`).join('')}
+          </div>
+        </section>
+        <section class="max-w-7xl mx-auto px-4 py-4">
+          <div class="flex justify-between items-end mb-4">
+            <h2 class="section-title text-2xl"><i class="fas fa-box-open icon-3d mr-2"></i>All <span>Products</span></h2>
+            <span id="products-count" class="text-sm text-gray-500"></span>
+          </div>
+          <div id="products-grid"><div class="flex justify-center py-12"><div class="spinner"></div></div></div>
+        </section>
+        <section class="bg-gray-50 border-y border-gray-200 py-16 px-4 text-center mt-8">
+          <i class="fas fa-rocket icon-3d text-5xl text-teal-600 mb-4"></i>
+          <h2 class="text-3xl font-bold text-gray-800">Je, wewe ni muuzaji?</h2>
+          <p class="text-gray-600 mb-6">Orodhesha bidhaa zako bure na uwafikie wanunuzi wengi.</p>
+          <button onclick="window.navigate('auth',{mode:'register'})" class="btn-primary text-lg px-8 py-3"><i class="fas fa-store mr-2"></i>Start Selling Free →</button>
+        </section>
+      </div>`;
+    window.loadProducts();
+  };
+
+  window.loadProducts = async function() {
+    try {
+      await window.waitForFB();
+      const snap = await window._bm.getDocs(window._bm.query(window._bm.collection(window._bm.db, 'products'), window._bm.orderBy('createdAt','desc')));
+      window.allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      window.renderProductGrid();
+    } catch(e) {
+      document.getElementById('products-grid').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle text-3xl mb-3"></i><p>Imeshindwa kupakia bidhaa.</p></div>`;
+    }
+  };
+
+  window.renderProductGrid = function() {
+    let filtered = [...window.allProducts];
+    if (window.locationFilter !== 'all') filtered = filtered.filter(p => p.location === window.locationFilter);
+    if (window.currentCategory !== 'All') filtered = filtered.filter(p => p.category === window.currentCategory);
+    const grid = document.getElementById('products-grid');
+    const countSpan = document.getElementById('products-count');
+    if (countSpan) countSpan.textContent = `${filtered.length} products`;
+    if (filtered.length === 0) {
+      grid.innerHTML = `<div class="empty-state"><i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i><p>Hakuna bidhaa kwa sasa.</p></div>`;
+      return;
+    }
+    grid.innerHTML = `<div class="products-grid">${filtered.map(p => window.productCard(p)).join('')}</div>`;
+  };
+
+  window.productCard = function(p) {
+    const img = p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.productName}">` : `<div class="h-48 bg-gray-100 flex items-center justify-center text-4xl text-gray-400"><i class="fas fa-cube icon-3d"></i></div>`;
+    return `
+    <div class="product-card cursor-pointer" onclick="window.navigate('product',{id:'${p.id}'})">
+      <div class="relative">${img}
+        <span class="badge-loc absolute top-2 right-2"><i class="fas ${p.location==='Zanzibar'?'fa-umbrella-beach':'fa-city'} mr-1"></i>${p.location}</span>
+      </div>
+      <div class="p-4">
+        ${p.category?`<span class="cat-tag"><i class="fas fa-tag mr-1"></i>${p.category}</span>`:''}
+        <h3 class="font-bold text-gray-800 mt-2 line-clamp-2">${p.productName}</h3>
+        <p class="text-teal-700 font-extrabold text-xl mt-1">TZS ${Number(p.price).toLocaleString()}</p>
+        <p class="text-xs text-gray-500 mt-2"><i class="fas fa-store mr-1"></i>${p.sellerName || 'Seller'}</p>
+        <button class="btn-primary w-full mt-3 text-sm py-2" onclick="event.stopPropagation();window.orderWhatsApp('${p.id}')"><i class="fab fa-whatsapp mr-1"></i> WhatsApp</button>
+      </div>
+    </div>`;
+  };
+
+  window.filterByCategory = (cat) => { window.currentCategory = cat; document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', b.textContent.includes(cat))); window.renderProductGrid(); };
+  window.setLocFilter = (loc) => { window.locationFilter = loc; document.querySelectorAll('.loc-pill').forEach(b => b.classList.remove('active')); document.getElementById(`loc-${loc==='all'?'all':loc==='Zanzibar'?'zanzibar':'dar'}`)?.classList.add('active'); window.renderProductGrid(); };
+  window.doSearch = (q) => { if(q.trim()) window.navigate('search', {q: q.trim()}); };
+
+  window.renderSearch = async function(q) {
+    const app = document.getElementById('app');
+    app.innerHTML = `<div class="page max-w-7xl mx-auto px-4 py-8">
+      <button onclick="window.navigate('home')" class="text-teal-600 mb-4 block"><i class="fas fa-arrow-left mr-2"></i>Back to Home</button>
+      <h2 class="section-title text-2xl mb-4">Search results for "<span>${q}</span>"</h2>
+      <div id="search-results"><div class="spinner mx-auto"></div></div>
+    </div>`;
+    await window.waitForFB();
+    if (window.allProducts.length===0) { const snap = await window._bm.getDocs(window._bm.collection(window._bm.db, 'products')); window.allProducts = snap.docs.map(d => ({id:d.id,...d.data()})); }
+    const results = window.allProducts.filter(p => p.productName?.toLowerCase().includes(q.toLowerCase()));
+    document.getElementById('search-results').innerHTML = results.length ? `<div class="products-grid">${results.map(p => window.productCard(p)).join('')}</div>` : `<div class="empty-state"><i class="fas fa-search text-5xl text-gray-300 mb-4"></i><p>No results found.</p></div>`;
+  };
+
+  window.renderProduct = async function(id) {
+    const app = document.getElementById('app');
+    app.innerHTML = `<div class="page max-w-5xl mx-auto px-4 py-8"><div class="spinner mx-auto"></div></div>`;
+    await window.waitForFB();
+    const snap = await window._bm.getDoc(window._bm.doc(window._bm.db, 'products', id));
+    if (!snap.exists()) { app.innerHTML = '<p class="text-center py-20">Bidhaa haipatikani.</p>'; return; }
+    const p = { id: snap.id, ...snap.data() };
+    let seller = {};
+    if (p.userId) { const s = await window._bm.getDoc(window._bm.doc(window._bm.db, 'users', p.userId)); if(s.exists()) seller = s.data(); }
+    app.innerHTML = `
+      <div class="page max-w-5xl mx-auto px-4 py-6">
+        <button onclick="window.navigate('home')" class="mb-4 text-teal-600"><i class="fas fa-arrow-left mr-2"></i>Back</button>
+        <div class="bg-white rounded-2xl shadow-sm border overflow-hidden md:flex">
+          <div class="md:w-1/2 bg-gray-50">${p.imageUrl?`<img src="${p.imageUrl}" class="w-full h-80 object-contain">`:`<div class="h-80 flex items-center justify-center text-6xl text-gray-400"><i class="fas fa-cube icon-3d"></i></div>`}</div>
+          <div class="md:w-1/2 p-6">
+            <div class="flex gap-2 mb-3">${p.category?`<span class="cat-tag"><i class="fas fa-tag mr-1"></i>${p.category}</span>`:''}<span class="badge-loc"><i class="fas ${p.location==='Zanzibar'?'fa-umbrella-beach':'fa-city'} mr-1"></i>${p.location}</span></div>
+            <h1 class="text-2xl font-bold text-gray-800">${p.productName}</h1>
+            <div class="text-3xl font-extrabold text-teal-700 my-3">TZS ${Number(p.price).toLocaleString()}</div>
+            <p class="text-gray-600 mb-6">${p.description || ''}</p>
+            <div class="bg-gray-50 p-4 rounded-xl mb-4"><p class="font-bold"><i class="fas fa-store mr-2"></i>${seller.businessName || p.sellerName}</p><p class="text-sm"><i class="fas fa-phone-alt mr-1"></i>${p.sellerPhone}</p></div>
+            <button class="btn-wa w-full" onclick="window.orderWhatsApp('${p.id}','${p.sellerPhone}','${p.productName}','${p.price}')"><i class="fab fa-whatsapp mr-2"></i>Order via WhatsApp</button>
+          </div>
+        </div>
+      </div>`;
+  };
+
+  window.orderWhatsApp = (id, phone, name, price) => {
+    if (!phone) { const p = window.allProducts.find(x=>x.id===id); if(p){phone=p.sellerPhone; name=p.productName; price=p.price;} }
+    if (!phone) { window.toast('Seller phone not available', 'error'); return; }
+    window.open(`https://wa.me/${phone.replace(/\D/g,'')}?text=${encodeURIComponent(`Habari! Nataka kuagiza: ${name} | Bei: TZS ${Number(price).toLocaleString()}`)}`, '_blank');
+  };
+
+  // ---------- AUTH ----------
+  window.renderAuth = function(mode) {
+    const isLogin = mode==='login';
+    document.getElementById('app').innerHTML = `
+      <div class="page min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
+        <div class="max-w-md w-full bg-white rounded-2xl shadow-sm border p-8">
+          <div class="text-center mb-6"><span class="brand-mark mx-auto mb-3">BM</span><h2 class="text-2xl font-bold">${isLogin?'Login':'Register'}</h2></div>
+          <div class="flex rounded-xl overflow-hidden mb-6 border">
+            <button onclick="window.navigate('auth',{mode:'login'})" class="flex-1 py-2 ${isLogin?'bg-teal-600 text-white':'bg-gray-100'}"><i class="fas fa-sign-in-alt mr-1"></i>Login</button>
+            <button onclick="window.navigate('auth',{mode:'register'})" class="flex-1 py-2 ${!isLogin?'bg-orange-500 text-white':'bg-gray-100'}"><i class="fas fa-user-plus mr-1"></i>Register</button>
+          </div>
+          ${isLogin ? `
+            <div><input id="l-email" type="email" placeholder="Email" class="form-input mb-3">
+            <input id="l-pass" type="password" placeholder="Password" class="form-input mb-4">
+            <button onclick="window.doLogin()" class="btn-teal w-full py-3"><i class="fas fa-sign-in-alt mr-2"></i>Login</button></div>
+          ` : `
+            <div><input id="r-bname" placeholder="Business Name" class="form-input mb-3">
+            <input id="r-email" type="email" placeholder="Email" class="form-input mb-3">
+            <input id="r-phone" placeholder="Phone Number (255...)" class="form-input mb-3">
+            <select id="r-loc" class="form-input mb-3"><option value="">Select Location</option><option>Zanzibar</option><option>Dar es Salaam</option></select>
+            <input id="r-pass" type="password" placeholder="Password" class="form-input mb-3">
+            <input id="r-pass2" type="password" placeholder="Confirm Password" class="form-input mb-4">
+            <button onclick="window.doRegister()" class="btn-primary w-full py-3"><i class="fas fa-check-circle mr-2"></i>Create Account</button></div>
+          `}
+        </div>
+      </div>`;
+  };
+
+  window.doLogin = async () => {
+    const email = document.getElementById('l-email').value.trim();
+    const pass = document.getElementById('l-pass').value;
+    if(!email||!pass) return window.toast('Please fill all fields','error');
+    try { await window.waitForFB(); await window._bm.signInWithEmailAndPassword(window._bm.auth, email, pass); window.toast('Login successful!'); } catch(e) { window.toast(e.message,'error'); }
+  };
+  window.doRegister = async () => {
+    const bname = document.getElementById('r-bname').value.trim();
+    const email = document.getElementById('r-email').value.trim();
+    const phone = document.getElementById('r-phone').value.trim();
+    const loc = document.getElementById('r-loc').value;
+    const pass = document.getElementById('r-pass').value;
+    const pass2 = document.getElementById('r-pass2').value;
+    if(!bname||!email||!phone||!loc||!pass) return window.toast('Please fill all fields','error');
+    if(pass!==pass2) return window.toast('Passwords do not match','error');
+    if(pass.length<6) return window.toast('Password must be at least 6 characters','error');
+    try {
+      await window.waitForFB();
+      const cred = await window._bm.createUserWithEmailAndPassword(window._bm.auth, email, pass);
+      await window._bm.setDoc(window._bm.doc(window._bm.db, 'users', cred.user.uid), {
+        businessName: bname, phoneNumber: phone, location: loc, email, createdAt: window._bm.serverTimestamp()
+      });
+      window.toast('Account created!');
+    } catch(e) { window.toast(e.message,'error'); }
+  };
+
+  // ---------- DASHBOARD ----------
+  window.renderDashboard = async function(view = 'products') {
+    console.log('renderDashboard view:', view);
+    if (!window.currentUser) return window.navigate('auth');
+    if (!window.currentUserData) {
+      await window.waitForFB();
+      const snap = await window._bm.getDoc(window._bm.doc(window._bm.db, 'users', window.currentUser.uid));
+      if (snap.exists()) window.currentUserData = { id: snap.id, ...snap.data() };
+    }
+    const app = document.getElementById('app');
+    app.innerHTML = `<div class="page flex min-h-screen bg-gray-50"><aside id="sidebar" class="w-64 p-6 text-white hidden md:block">
+      <div class="mb-8"><span class="brand-mark mb-2">BM</span><p class="text-sm opacity-70">Dashboard</p></div>
+      <button onclick="window.renderDashboard('products')" class="sidebar-link w-full text-left ${view==='products'?'active':''}"><i class="fas fa-box mr-3"></i>My Products</button>
+      <button onclick="window.renderDashboard('add')" class="sidebar-link w-full text-left ${view==='add'?'active':''}"><i class="fas fa-plus-circle mr-3"></i>Add Product</button>
+      <button onclick="window.navigate('home')" class="sidebar-link w-full text-left"><i class="fas fa-home mr-3"></i>Market</button>
+    </aside><div class="flex-1 p-6"><div id="dash-content"></div></div></div>`;
+    if (view === 'products') await window.renderMyProducts();
+    else if (view === 'add') window.renderAddProduct();
+    else if (view === 'edit') window.renderEditProduct(window._navData?.productId);
+  };
+
+  window.renderMyProducts = async function() {
+    const cont = document.getElementById('dash-content');
+    cont.innerHTML = `<div class="spinner mx-auto"></div>`;
+    try {
+      await window.waitForFB();
+      const q = window._bm.query(window._bm.collection(window._bm.db, 'products'), window._bm.where('userId', '==', window.currentUser.uid), window._bm.orderBy('createdAt','desc'));
+      const snap = await window._bm.getDocs(q);
+      const prods = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      cont.innerHTML = `<div class="flex justify-between items-center mb-6"><h2 class="text-2xl font-bold"><i class="fas fa-boxes mr-2"></i>My Products (${prods.length})</h2><button onclick="window.renderDashboard('add')" class="btn-primary"><i class="fas fa-plus mr-1"></i>Add New</button></div>`;
+      if(prods.length===0) cont.innerHTML += `<div class="empty-state"><i class="fas fa-box-open text-6xl text-gray-300 mb-4"></i>No products yet.</div>`;
+      else {
+        cont.innerHTML += `<div class="grid gap-3">${prods.map(p => `
+          <div class="bg-white p-4 rounded-xl border flex items-center gap-4">
+            ${p.imageUrl?`<img src="${p.imageUrl}" class="w-16 h-16 object-cover rounded">`:`<div class="w-16 h-16 bg-gray-100 rounded flex items-center justify-center"><i class="fas fa-cube text-2xl text-teal-600"></i></div>`}
+            <div class="flex-1"><h3 class="font-bold">${p.productName}</h3><p class="text-sm text-gray-500">${p.category} · TZS ${p.price}</p></div>
+            <button onclick="window.startEdit('${p.id}')" class="btn-outline text-sm"><i class="fas fa-edit"></i> Edit</button>
+            <button onclick="window.deleteProduct('${p.id}')" class="text-red-500"><i class="fas fa-trash"></i> Delete</button>
+          </div>`).join('')}</div>`;
+      }
+    } catch(e) {
+      cont.innerHTML = `<p class="text-red-500">Error: ${e.message}. Ensure Firestore index is created if needed.</p>`;
+      console.error(e);
+    }
+  };
+
+  window.startEdit = (id) => { window._navData = {productId:id}; window.renderDashboard('edit'); };
+  window.deleteProduct = async (id) => { if(!confirm('Delete this product?')) return; await window._bm.deleteDoc(window._bm.doc(window._bm.db, 'products', id)); window.toast('Deleted'); window.renderMyProducts(); };
+
+  window.renderAddProduct = function() {
+    const cont = document.getElementById('dash-content');
+    window.pendingImageFile = null;
+    cont.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4"><i class="fas fa-plus-circle mr-2"></i>Add New Product</h2>
+      <div class="bg-white p-6 rounded-xl border max-w-xl">
+        <input id="p-name" placeholder="Product Name *" class="form-input mb-3">
+        <input id="p-price" type="number" placeholder="Price (TZS) *" class="form-input mb-3">
+        <select id="p-cat" class="form-input mb-3"><option value="">Select Category</option>
+          <option value="Food & Drinks">Food & Drinks</option><option value="Fashion & Clothing">Fashion & Clothing</option>
+          <option value="Electronics">Electronics</option><option value="Home & Living">Home & Living</option>
+          <option value="Beauty & Health">Beauty & Health</option><option value="Crafts & Art">Crafts & Art</option>
+          <option value="Agriculture">Agriculture</option><option value="Services">Services</option>
+        </select>
+        <select id="p-loc" class="form-input mb-3"><option value="">Location</option><option>Zanzibar</option><option>Dar es Salaam</option></select>
+        <textarea id="p-desc" placeholder="Description" class="form-input mb-3"></textarea>
+        <div class="mb-3">
+          <label class="form-label">Product Image *</label>
+          <div class="upload-area" onclick="document.getElementById('p-img-file').click()">
+            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+            <p class="text-sm font-semibold">Click to select an image</p>
+            <img id="img-preview" class="mt-3 mx-auto max-h-32 hidden rounded" />
+          </div>
+          <input type="file" id="p-img-file" accept="image/*" class="hidden" onchange="window.handleImageSelect(event)" />
+        </div>
+        <button onclick="window.saveProduct()" class="btn-primary w-full py-3"><i class="fas fa-cloud-upload-alt mr-2"></i>Publish Product</button>
+      </div>`;
+  };
+
+  window.handleImageSelect = function(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    window.pendingImageFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = document.getElementById('img-preview');
+      preview.src = e.target.result;
+      preview.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  window.renderEditProduct = async function(id) {
+    await window.waitForFB();
+    const snap = await window._bm.getDoc(window._bm.doc(window._bm.db, 'products', id));
+    if(!snap.exists()) return window.renderDashboard('products');
+    const p = snap.data();
+    const cont = document.getElementById('dash-content');
+    cont.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4"><i class="fas fa-edit mr-2"></i>Edit Product</h2>
+      <div class="bg-white p-6 rounded-xl border max-w-xl">
+        <input id="p-name" value="${p.productName||''}" class="form-input mb-3">
+        <input id="p-price" type="number" value="${p.price||''}" class="form-input mb-3">
+        <select id="p-cat" class="form-input mb-3">
+          ${['Food & Drinks','Fashion & Clothing','Electronics','Home & Living','Beauty & Health','Crafts & Art','Agriculture','Services'].map(c=>`<option value="${c}" ${p.category===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+        <select id="p-loc" class="form-input mb-3"><option ${p.location==='Zanzibar'?'selected':''}>Zanzibar</option><option ${p.location==='Dar es Salaam'?'selected':''}>Dar es Salaam</option></select>
+        <textarea id="p-desc" class="form-input mb-3">${p.description||''}</textarea>
+        <div class="mb-3">
+          <label class="form-label">Image</label>
+          ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-32 h-32 object-cover rounded mb-2">` : ''}
+          <div class="upload-area" onclick="document.getElementById('edit-img-file').click()">
+            <i class="fas fa-cloud-upload-alt"></i> Upload new image
+          </div>
+          <input type="file" id="edit-img-file" accept="image/*" class="hidden" onchange="window.handleEditImageSelect(event)" />
+        </div>
+        <button onclick="window.saveProduct('${id}')" class="btn-primary w-full py-3"><i class="fas fa-save mr-2"></i>Save Changes</button>
+      </div>`;
+    window.pendingEditImageFile = null;
+  };
+
+  window.handleEditImageSelect = function(event) {
+    const file = event.target.files[0];
+    if (file) window.pendingEditImageFile = file;
+  };
+
+  async function uploadToCloudinary(file) {
+    const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_UPLOAD_PRESET } = window._bm;
+    if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) throw new Error('Cloudinary not configured');
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    fd.append('folder', 'bongo-market');
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data.secure_url;
+  }
+
+  window.saveProduct = async function(existingId=null) {
+    const name = document.getElementById('p-name').value.trim();
+    const price = document.getElementById('p-price').value;
+    const cat = document.getElementById('p-cat').value;
+    const loc = document.getElementById('p-loc').value;
+    const desc = document.getElementById('p-desc').value.trim();
+    if(!name||!price||!loc) return window.toast('Please fill required fields','error');
+
+    const selectedFile = existingId ? window.pendingEditImageFile : window.pendingImageFile;
+    if (!existingId && !selectedFile) return window.toast('Please select an image','error');
+
+    try {
+      await window.waitForFB();
+      let imageUrl = existingId ? (document.querySelector('#dash-content img')?.src || null) : null;
+      if (selectedFile) {
+        window.toast('Uploading image...', 'info');
+        imageUrl = await uploadToCloudinary(selectedFile);
+      }
+      const data = {
+        productName: name, price: Number(price), category: cat, location: loc, description: desc,
+        imageUrl: imageUrl || null,
+        userId: window.currentUser.uid,
+        sellerName: window.currentUserData?.businessName || 'Seller',
+        sellerPhone: window.currentUserData?.phoneNumber || ''
+      };
+      if (existingId) {
+        await window._bm.updateDoc(window._bm.doc(window._bm.db, 'products', existingId), data);
+        window.toast('Product updated!');
+      } else {
+        data.createdAt = window._bm.serverTimestamp();
+        await window._bm.addDoc(window._bm.collection(window._bm.db, 'products'), data);
+        window.toast('Product published!');
+      }
+      window.renderDashboard('products');
+    } catch(e) {
+      window.toast(e.message, 'error');
+    }
+  };
+
+  // Start the app
+  window.navigate('home');
+</script>
+</body>
+</html>
